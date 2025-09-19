@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Mean, Median, Modus Modern</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+  margin:20px;
+  background: linear-gradient(135deg, #c2e7ff, #ffc2e7);
+  color: #333;
+}
+h2,h3{
+  text-align:center;
+  color:#1a1a2e;
+}
+.container {
+  max-width:900px;
+  margin:auto;
+  background:#ffffffee;
+  padding:25px;
+  border-radius:15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border: 2px solid #ff6fb5;
+}
+label {
+  font-weight:bold;
+  display:block;
+  margin-top:15px;
+  color:#1a1a2e;
+}
+input, button {
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  margin-bottom:20px;
+  border-radius:8px;
+  border:2px solid #1a1a2e;
+  box-sizing:border-box;
+  font-size:14px;
+}
+input:focus{
+  outline:none;
+  border-color:#ff6fb5;
+  box-shadow: 0 0 10px #ff6fb5;
+}
+button {
+  background:#1a1a2e;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+  transition: all 0.3s ease;
+}
+button:hover {
+  background:#ff6fb5;
+  transform: scale(1.05);
+}
+.result {
+  margin-top:25px;
+  padding:20px;
+  background:#e0f7ff;
+  border-radius:12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow-x:auto;
+}
+table {
+  border-collapse: collapse;
+  width:100%;
+  min-width:500px;
+  margin-top:15px;
+}
+th, td {
+  border:1px solid #1a1a2e;
+  padding:10px;
+  text-align:center;
+  vertical-align:middle;
+  transition: all 0.2s ease;
+}
+th {
+  background:#1a1a2e;
+  color:#ff6fb5;
+  font-weight:bold;
+}
+td:hover{
+  background: #ffd6f0;
+  cursor:pointer;
+}
+.langkah {
+  background:#ffe0f0;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+  font-size:14px;
+  white-space:pre-wrap;
+  border-left: 4px solid #1a1a2e;
+  text-align:left;
+}
+@media (max-width:768px){
+  body{margin:10px;}
+  .container{padding:20px;}
+  h2{font-size:22px;}
+  h3{font-size:18px;}
+  input, button{padding:8px;}
+  th, td{padding:6px;font-size:13px;}
+  .langkah{font-size:12px;}
+}
+@media (max-width:480px){
+  table{min-width:400px;}
+  th, td{padding:4px;font-size:11px;}
+  .langkah{font-size:11px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Kalkulator Mean, Median, Modus</h2>
+
+<div class="penjelasan">
+<h3>Instruksi Penggunaan</h3>
+<ol>
+<li>Masukkan data angka, pisahkan dengan koma. Contoh: 5,7,8,12,13,15,18,21,23,27</li>
+<li>Tekan tombol "Hitung Semua". Data akan diurutkan secara otomatis.</li>
+<li>Hasil menampilkan **Mean, Median, Modus** beserta langkah perhitungan detail.</li>
+</ol>
+</div>
+
+<label>Masukkan Data:</label>
+<input type="text" id="dataInput" placeholder="Contoh: 5,7,8,12,13,15,18,21,23,27">
+
+<button onclick="hitungSemua()">Hitung Semua</button>
+
+<div class="result" id="output"></div>
+</div>
+
+<script>
+function hitungSemua(){
+  let input = document.getElementById("dataInput").value;
+  if(!input){ document.getElementById("output").innerText="⚠️ Masukkan data."; return; }
+
+  let data = input.split(",").map(x=>parseFloat(x.trim())).filter(x=>!isNaN(x)).sort((a,b)=>a-b);
+  let n = data.length;
+  if(n===0){ document.getElementById("output").innerText="⚠️ Data tidak valid."; return; }
+
+  // Mean
+  let sum = data.reduce((a,b)=>a+b,0);
+  let mean = sum/n;
+  let langkahMean = `Langkah Mean:\n1️⃣ Jumlahkan semua data: ${data.join(" + ")} = ${sum}\n2️⃣ Bagi jumlah dengan n = ${n}\nMean = ${mean.toFixed(2)}`;
+
+  // Median
+  let median;
+  let langkahMedian;
+  if(n%2===1){
+    median = data[Math.floor(n/2)];
+    langkahMedian = `Langkah Median:\n1️⃣ Urutkan data: [${data.join(", ")}]\n2️⃣ Karena n ganjil (${n}), ambil data tengah ke-${Math.floor(n/2)+1} = ${median}`;
+  }else{
+    let mid1 = data[n/2 -1];
+    let mid2 = data[n/2];
+    median = (mid1+mid2)/2;
+    langkahMedian = `Langkah Median:\n1️⃣ Urutkan data: [${data.join(", ")}]\n2️⃣ Karena n genap (${n}), ambil dua data tengah ke-${n/2} (${mid1}) dan ke-${n/2+1} (${mid2})\n3️⃣ Median = (${mid1} + ${mid2}) / 2 = ${median}`;
+  }
+
+  // Modus
+  let freq = {};
+  data.forEach(x=> freq[x]=(freq[x]||0)+1);
+  let maxFreq = Math.max(...Object.values(freq));
+  let modus = Object.keys(freq).filter(k=>freq[k]===maxFreq).map(Number);
+  let langkahModus = `Langkah Modus:\n1️⃣ Hitung frekuensi setiap data: ${JSON.stringify(freq)}\n2️⃣ Ambil data dengan frekuensi terbesar (${maxFreq})\nModus = ${modus.join(", ")}`;
+
+  document.getElementById("output").innerHTML = `
+<h3>Hasil Statistik</h3>
+<table>
+<tr><th>Statistik</th><th>Nilai</th><th>Langkah Perhitungan</th></tr>
+<tr><td>Mean</td><td>${mean.toFixed(2)}</td><td class="langkah">${langkahMean}</td></tr>
+<tr><td>Median</td><td>${median}</td><td class="langkah">${langkahMedian}</td></tr>
+<tr><td>Modus</td><td>${modus.join(", ")}</td><td class="langkah">${langkahModus}</td></tr>
+</table>
+  `;
+}
+</script>
+</body>
+</html>
